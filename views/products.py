@@ -1,8 +1,10 @@
 """
 Products
 """
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect
 from werkzeug.exceptions import NotFound
+
+from views.forms.products import ProductForm
 
 products_app = Blueprint(
     "products_app",
@@ -47,3 +49,28 @@ def get_product_by_id(product_id: int):
         product_id=product_id,
         product_name=product_name,
     )
+
+
+@products_app.route(
+    "/add/",
+    methods=["GET", "POST"],
+    endpoint="add",
+)
+def add_product():
+    """
+    Add product
+    :return:
+    """
+    form = ProductForm()
+
+    if request.method == "GET":
+        return render_template("products/add.html", form=form)
+
+    if not form.validate_on_submit():
+        return render_template("products/add.html", form=form), 400
+
+    # post
+    product_name = form.name.data
+    print(product_name)
+
+    return redirect('/')
